@@ -24,7 +24,7 @@ class population:
 
     def debug(self):
         for m in self.members:
-            print(f"{m.genome} score: {m.fitness}")
+            print(f"id: {str(m.id).zfill(2)} genome: {m.genome} score: {m.fitness}")
 
     def select(self):
         for m in self.members:
@@ -37,7 +37,6 @@ class population:
                 m1 = self.members[i].genome
                 m2 = self.members[i+1].genome
                 parent_pool = [m1, m2]
-                #print(parent_pool)
                 ch1 = []
                 ch2 = []
                 for j, gene in enumerate(m1):
@@ -45,10 +44,34 @@ class population:
                     choice2 = abs(choice1-1)
                     ch1.append(parent_pool[choice1][j])
                     ch2.append(parent_pool[choice2][j])
-                #print([ch1, ch2])
                 self.members[i].genome = ch1
-                #print(f"length: {len(self.members)}")
                 self.members[i+1].genome = ch2
+
+    def crossover_cull(self, cull_percent, child_count):
+        next_gen = []
+        for i in range(round(self.member_count*cull_percent), self.member_count, 2):
+            if i+1 < len(self.members):
+                generated = self.generate_children(self.members[i].genome, self.members[i+1].genome, child_count)
+                for ch in generated:
+                    next_gen.append(ch)
+        print(f"next: {next_gen}")
+        print(f"members: {[m.genome for m in self.members]}")
+        for i, m in enumerate(self.members):
+            pass ####Fix
+                
+
+    def generate_children(self, g1, g2, ch_count):
+        #g1/g2 = [0,0,...]
+        pool = [g1, g2]
+        children = []
+        for i in range(ch_count):
+            ch = []
+            for j, gene in enumerate(g1):
+                ch.append(pool[rint(0,1)][j])
+            children.append(ch)
+        print(f"children: {children}")
+        return children
+
                 
     def mutate(self):
         for i, m in enumerate(self.members):
@@ -82,14 +105,14 @@ def step_pop(pop):
     print("select")
     pop.select()
     print("crossover")
-    pop.crossover()
+    pop.crossover_cull(0.2)
     print("mutate")
     pop.mutate()
     p1.debug()
 
 def silent_step_pop(pop):
     pop.select()
-    pop.crossover()
+    pop.crossover_cull(0.2)
     pop.mutate()
 
 while True:
